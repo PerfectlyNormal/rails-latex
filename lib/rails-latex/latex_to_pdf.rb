@@ -27,8 +27,14 @@ class LatexToPdf
       fork do
         begin
           Dir.chdir dir
-          STDOUT.reopen("input.log","a")
-          STDERR.reopen(STDOUT)
+          
+          # Passenger 4 likes to use STDOUT for their own purposes, and don't
+          # like us changing it.
+          # https://github.com/jacott/rails-latex/issues/28
+          #
+          #STDOUT.reopen("input.log","a")
+          #STDERR.reopen(STDOUT)
+
           args=config[:arguments] + %w[-shell-escape -interaction batchmode input.tex]
           system config[:command],'-draftmode',*args if parse_twice
           exec config[:command],*args
